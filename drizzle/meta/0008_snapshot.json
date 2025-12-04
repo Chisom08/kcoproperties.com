@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "76c9e933-290f-4990-858e-7df662ba04ac",
-  "prevId": "02b5ae1d-2ee2-458d-b1ed-fa73fe75163b",
+  "id": "bfae8fd6-e7e3-4843-bdcf-d4b7c1dde3df",
+  "prevId": "8866d9e6-de82-4ec7-afe6-b456e401fdaa",
   "tables": {
     "applications": {
       "name": "applications",
@@ -261,7 +261,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -270,7 +270,7 @@
           "notNull": true,
           "autoincrement": false,
           "onUpdate": true,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},
@@ -345,7 +345,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},
@@ -441,7 +441,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -450,7 +450,7 @@
           "notNull": true,
           "autoincrement": false,
           "onUpdate": true,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},
@@ -554,7 +554,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -563,7 +563,7 @@
           "notNull": true,
           "autoincrement": false,
           "onUpdate": true,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},
@@ -638,7 +638,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},
@@ -748,7 +748,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -757,7 +757,7 @@
           "notNull": true,
           "autoincrement": false,
           "onUpdate": true,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},
@@ -945,7 +945,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -954,7 +954,7 @@
           "notNull": true,
           "autoincrement": false,
           "onUpdate": true,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},
@@ -1080,7 +1080,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -1089,7 +1089,7 @@
           "notNull": true,
           "autoincrement": false,
           "onUpdate": true,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},
@@ -1227,7 +1227,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -1236,7 +1236,7 @@
           "notNull": true,
           "autoincrement": false,
           "onUpdate": true,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},
@@ -1304,7 +1304,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -1313,7 +1313,7 @@
           "notNull": true,
           "autoincrement": false,
           "onUpdate": true,
-          "default": "now()"
+          "default": "(now())"
         },
         "lastSignedIn": {
           "name": "lastSignedIn",
@@ -1321,7 +1321,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "now()"
+          "default": "(now())"
         }
       },
       "indexes": {},

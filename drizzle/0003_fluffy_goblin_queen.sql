@@ -6,6 +6,6 @@ CREATE TABLE `contactMessages` (
 	`subject` varchar(500) NOT NULL,
 	`message` text NOT NULL,
 	`status` enum('new','read','responded') NOT NULL DEFAULT 'new',
-	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`createdAt` timestamp NOT NULL DEFAULT now(),
 	CONSTRAINT `contactMessages_id` PRIMARY KEY(`id`)
 );

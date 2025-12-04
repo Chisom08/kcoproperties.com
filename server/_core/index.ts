@@ -56,11 +56,9 @@ async function startServer() {
 
   if (port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
-  }
-
+} 
   server.listen(port, '0.0.0.0', () => {
-    console.log(`Server running on http:/0000:${port}/`);
-    
+    console.log(`Server running on http:/0000:${port}/`);    
     // Start tour reminder scheduler
     startTourReminderScheduler();
   });
