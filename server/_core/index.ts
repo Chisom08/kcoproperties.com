@@ -59,7 +59,7 @@ async function startServer() {
   }
 
   server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+    console.log(`Server running on http://0000:${port}/`);
     
     // Start tour reminder scheduler
     startTourReminderScheduler();

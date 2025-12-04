@@ -12,7 +12,7 @@ CREATE TABLE `tourBookings` (
 	`confirmedBy` int,
 	`confirmedAt` timestamp,
 	`adminNotes` text,
-	`createdAt` timestamp NOT NULL DEFAULT (now()),
-	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`createdAt` timestamp NOT NULL DEFAULT now(),
+	`updatedAt` timestamp NOT NULL DEFAULT now() ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `tourBookings_id` PRIMARY KEY(`id`)
 );

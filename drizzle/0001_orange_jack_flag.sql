@@ -33,9 +33,9 @@ CREATE TABLE `applications` (
 	`paymentTransactionId` varchar(255),
 	`adminNotes` text,
 	`reviewedBy` int,
-	`reviewedAt` timestamp,
-	`createdAt` timestamp NOT NULL DEFAULT (now()),
-	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`reviewedAt` varchar(255),
+	`createdAt` timestamp NOT NULL DEFAULT now(),
+	`updatedAt` timestamp NOT NULL DEFAULT now() ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `applications_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -45,13 +45,13 @@ CREATE TABLE `leases` (
 	`tenantId` int NOT NULL,
 	`applicationId` int,
 	`leaseStartDate` timestamp NOT NULL,
-	`leaseEndDate` timestamp NOT NULL,
+	`leaseEndDate` varchar(255) NOT NULL,
 	`monthlyRent` int NOT NULL,
 	`securityDeposit` int NOT NULL,
 	`leaseDocumentUrl` varchar(500),
 	`status` enum('active','expired','terminated','pending') NOT NULL DEFAULT 'pending',
-	`createdAt` timestamp NOT NULL DEFAULT (now()),
-	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`createdAt` timestamp NOT NULL DEFAULT now(),
+	`updatedAt` timestamp NOT NULL DEFAULT now() ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `leases_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -67,8 +67,8 @@ CREATE TABLE `maintenanceRequests` (
 	`assignedTo` int,
 	`completedAt` timestamp,
 	`adminNotes` text,
-	`createdAt` timestamp NOT NULL DEFAULT (now()),
-	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`createdAt` timestamp NOT NULL DEFAULT now(),
+	`updatedAt` timestamp NOT NULL DEFAULT now() ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `maintenanceRequests_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -80,7 +80,7 @@ CREATE TABLE `messages` (
 	`subject` varchar(255),
 	`content` text NOT NULL,
 	`isRead` boolean NOT NULL DEFAULT false,
-	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`createdAt` timestamp NOT NULL DEFAULT now(),
 	CONSTRAINT `messages_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -94,11 +94,11 @@ CREATE TABLE `payments` (
 	`transactionId` varchar(255),
 	`status` enum('pending','completed','failed','refunded') NOT NULL DEFAULT 'pending',
 	`paymentDate` timestamp NOT NULL,
-	`dueDate` timestamp,
+	`dueDate` varchar(255),
 	`notes` text,
 	`receiptUrl` varchar(500),
-	`createdAt` timestamp NOT NULL DEFAULT (now()),
-	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`createdAt` timestamp NOT NULL DEFAULT now(),
+	`updatedAt` timestamp NOT NULL DEFAULT now() ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `payments_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -126,7 +126,7 @@ CREATE TABLE `properties` (
 	`virtualTourUrl` varchar(500),
 	`latitude` varchar(50),
 	`longitude` varchar(50),
-	`createdAt` timestamp NOT NULL DEFAULT (now()),
-	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`createdAt` timestamp NOT NULL DEFAULT now(),
+	`updatedAt` timestamp NOT NULL DEFAULT now() ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `properties_id` PRIMARY KEY(`id`)
 );

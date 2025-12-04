@@ -11,11 +11,11 @@ CREATE TABLE `units` (
 	`isAvailable` boolean NOT NULL DEFAULT true,
 	`availableDate` timestamp,
 	`currentTenantId` int,
-	`leaseEndDate` timestamp,
+	`leaseEndDate` varchar(255),
 	`amenities` text,
 	`images` text,
 	`floorPlanUrl` varchar(500),
-	`createdAt` timestamp NOT NULL DEFAULT (now()),
-	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`createdAt` timestamp NOT NULL DEFAULT now(),
+	`updatedAt` timestamp NOT NULL DEFAULT now() ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `units_id` PRIMARY KEY(`id`)
 );
