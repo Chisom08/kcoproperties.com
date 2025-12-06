@@ -31,15 +31,6 @@ export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
       _db = drizzle(process.env.DATABASE_URL);
-      seed().catch((error) => {
-  console.error('Error seeding database:', error);
-  process.exit(1);
-});
-seedUnits().catch((error) => {
-  console.error('Error seeding database:', error);
-  process.exit(1);
-});
-
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;

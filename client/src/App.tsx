@@ -16,6 +16,7 @@ import TermsOfService from "./pages/TermsOfService";
 import ScheduleTour from "./pages/ScheduleTour";
 import AdminDashboard from "./pages/AdminDashboard";
 import Amenities from "./pages/Amenities";
+import CorporateLease from "./pages/CorporateLease";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path={"/properties/:id"} component={PropertyDetail} />
       <Route path={"/vacancies"} component={Vacancies} />
       <Route path={"amenities"} component={Amenities} />
+      <Route path={"corporate-lease"} component={CorporateLease} />
       <Route path={"/contact"} component={Contact} />
       <Route path={"/apply"} component={Apply} />
       <Route path={"/privacy"} component={PrivacyPolicy} />
