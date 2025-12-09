@@ -104,6 +104,9 @@ export default function Header() {
               <Link href="/amenities" className="text-foreground hover:text-primary font-medium transition-colors py-2">
                 Amenities
               </Link>
+               <Link href="/corporate-lease" className="text-foreground hover:text-primary font-medium transition-colors">
+              Corporate Lease
+            </Link>
               <Link href="/contact" className="text-foreground hover:text-primary font-medium transition-colors py-2">
                 Contact
               </Link>
