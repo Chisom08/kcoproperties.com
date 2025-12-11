@@ -1,6 +1,9 @@
 import { Shield, Car, Wrench, Home, MapPin, Heart, Utensils, ShoppingBag } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import SEO from "@/components/SEO";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 interface Amenity {
   icon: React.ReactNode;
@@ -53,7 +56,10 @@ const amenities: Amenity[] = [
 
 export default function Amenities() {
   return (
+    <>
+    
     <div className="min-h-screen bg-white">
+      <Header />
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-[#0B2545] to-[#134074] text-white py-24">
         <div className="container mx-auto px-4">
@@ -152,6 +158,9 @@ export default function Amenities() {
           </div>
         </div>
       </section>
+      <Footer />
+    
     </div>
+    </>
   );
 }
