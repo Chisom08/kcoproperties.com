@@ -16,7 +16,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
             <img src={APP_LOGO} alt="KCO Properties" className="h-12 w-auto" />
-            <span className="text-xl font-bold text-primary hidden sm:inline">KCO Properties</span>
+            <span className="text-xl font-bold text-primary hidden sm:inline">KCO <br /> Properties</span>
           </Link>
 
           {/* Desktop Navigation */}
