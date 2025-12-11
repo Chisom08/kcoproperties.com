@@ -16,11 +16,11 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
             <img src={APP_LOGO} alt="KCO Properties" className="h-12 w-auto" />
-            <span className="text-xl font-bold text-primary hidden sm:inline">KCO <br /> Properties</span>
+            <span className="text-xl font-bold text-primary hidden sm:inline"><div className="m-0 p-0">KCO</div> <div className="m-0 p-0">Properties</div></span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-4">
             <Link href="/" className="text-foreground hover:text-primary font-medium transition-colors">
               Home
             </Link>
