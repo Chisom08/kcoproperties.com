@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { APP_LOGO } from "@/const";
+import { APP_LOGO, getLoginUrl } from "@/const";
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from "lucide-react";
 
 export default function Footer() {
@@ -46,9 +46,10 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/tenant-portal" className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors">
-                  Tenant Portal
-                </Link>
+              <a href={getLoginUrl()} target="_blank" className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors">
+                   Tenant Portal 
+              </a>
+              
               </li>
               <li>
                 <Link href="/about" className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors">
@@ -69,7 +70,7 @@ export default function Footer() {
               <li className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <Phone className="h-4 w-4 flex-shrink-0" />
                 <a href="tel:+1234567890" className="hover:text-secondary transition-colors">
-                  (123) 456-7890
+                  (901) 607-7890
                 </a>
               </li>
               <li className="flex items-center gap-2 text-sm text-primary-foreground/80">

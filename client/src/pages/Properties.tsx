@@ -49,13 +49,14 @@ export default function Properties() {
       
       <main className="flex-1">
         {/* Page Header with Background */}
-        <section className="relative bg-primary text-primary-foreground py-20 md:py-28">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/90"></div>
-          <div className="container relative z-10">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">All Properties</h1>
-            <p className="text-xl text-primary-foreground/90 max-w-2xl">
-              Browse our complete collection of rental properties
-            </p>
+        <section className="relative bg-gradient-to-br from-[#0B2545] to-[#134074] text-white py-24">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">All Properties</h1>
+              <p className="text-xl text-gray-200 leading-relaxed">
+                Browse our complete collection of rental properties
+              </p>
+            </div>
           </div>
         </section>
 

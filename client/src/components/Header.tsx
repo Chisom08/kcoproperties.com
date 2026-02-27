@@ -16,7 +16,10 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
             <img src={APP_LOGO} alt="KCO Properties" className="h-12 w-auto" />
-            <span className="text-lg font-bold text-primary hidden sm:inline"><div className="m-0 p-0">KCO</div> <div className="m-0 p-0">Properties</div></span>
+            <span className="flex flex-col gap-0 leading-none text-lg font-bold text-primary hidden sm:inline font-[Montserrat]">
+              <div className="m-0 p-0 leading-none">KCO</div>
+              <div className="m-0 p-0 leading-none">PROPERTIES</div>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -60,7 +63,7 @@ export default function Header() {
                 )}
               </>
             ) : (
-              <a href={getLoginUrl()}>
+              <a href={getLoginUrl()} target="_blank">
                 <Button variant="outline">Tenant Login</Button>
               </a>
             )}
@@ -123,7 +126,7 @@ export default function Header() {
                     )}
                   </>
                 ) : (
-                  <a href={getLoginUrl()}>
+                  <a href={getLoginUrl()} target="_blank">
                     <Button variant="outline" className="w-full">Tenant Login</Button>
                   </a>
                 )}

@@ -12,12 +12,14 @@ export default function About() {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-primary to-primary/90 text-primary-foreground py-16">
-          <div className="container">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">About KCO Properties</h1>
-            <p className="text-xl text-primary-foreground/90 max-w-3xl">
-              Your trusted partner for quality rental homes and professional property management
-            </p>
+        <section className="relative bg-gradient-to-br from-[#0B2545] to-[#134074] text-white py-24">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">About KCO Properties</h1>
+              <p className="text-xl text-gray-200 leading-relaxed">
+                Your trusted partner for quality rental homes and professional property management
+              </p>
+            </div>
           </div>
         </section>
 

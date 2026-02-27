@@ -41,12 +41,14 @@ export default function Vacancies() {
       
       <main className="flex-1">
         {/* Page Header */}
-        <section className="bg-gradient-to-br from-primary to-primary/90 text-primary-foreground py-12">
-          <div className="container">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Available Vacancies</h1>
-            <p className="text-xl text-primary-foreground/90">
-              Find your perfect home from our currently available rental properties
-            </p>
+        <section className="relative bg-gradient-to-br from-[#0B2545] to-[#134074] text-white py-24">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">Available Vacancies</h1>
+              <p className="text-xl text-gray-200 leading-relaxed">
+                Find your perfect home from our currently available rental properties
+              </p>
+            </div>
           </div>
         </section>
 

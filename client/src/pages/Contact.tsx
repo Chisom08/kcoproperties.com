@@ -39,12 +39,14 @@ export default function Contact() {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-primary to-primary/90 text-primary-foreground py-16">
-          <div className="container">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
-            <p className="text-xl text-primary-foreground/90">
-              We're here to help. Get in touch with our team today.
-            </p>
+        <section className="relative bg-gradient-to-br from-[#0B2545] to-[#134074] text-white py-24">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
+              <p className="text-xl text-gray-200 leading-relaxed">
+                We're here to help. Get in touch with our team today.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -56,51 +58,66 @@ export default function Contact() {
               <div className="space-y-6">
                 <Card>
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-                      <Phone className="h-6 w-6 text-secondary" />
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
+                        <Phone className="h-6 w-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">Phone</h3>
+                        <a
+                          href="tel:+1234567890"
+                          className="text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          (901) 607-7890
+                        </a>
+                      </div>
                     </div>
-                    <h3 className="font-semibold text-lg mb-2">Phone</h3>
-                    <a href="tel:+1234567890" className="text-muted-foreground hover:text-primary transition-colors">
-                      (123) 456-7890
-                    </a>
+
+                    <div className="mt-6 flex items-start gap-4">
+                      <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
+                        <Mail className="h-6 w-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">Email</h3>
+                        <a
+                          href="mailto:info@kcoproperties.com"
+                          className="text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          info@kcoproperties.com
+                        </a>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-                      <Mail className="h-6 w-6 text-secondary" />
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
+                        <MapPin className="h-6 w-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">Office</h3>
+                        <p className="text-muted-foreground">
+                          123 Main Street
+                          <br />
+                          Your City, ST 12345
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="font-semibold text-lg mb-2">Email</h3>
-                    <a href="mailto:info@kcoproperties.com" className="text-muted-foreground hover:text-primary transition-colors">
-                      info@kcoproperties.com
-                    </a>
-                  </CardContent>
-                </Card>
 
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-                      <MapPin className="h-6 w-6 text-secondary" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">Office</h3>
-                    <p className="text-muted-foreground">
-                      123 Main Street<br />
-                      Your City, ST 12345
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-                      <Clock className="h-6 w-6 text-secondary" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">Office Hours</h3>
-                    <div className="text-muted-foreground space-y-1">
-                      <p>Monday - Friday: 9:00 AM - 5:00 PM</p>
-                      <p>Saturday: 10:00 AM - 2:00 PM</p>
-                      <p>Sunday: Closed</p>
+                    <div className="mt-6 flex items-start gap-4">
+                      <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
+                        <Clock className="h-6 w-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">Office Hours</h3>
+                        <div className="text-muted-foreground space-y-1">
+                          <p>Monday - Friday: 9:00 AM - 5:00 PM</p>
+                          <p>Saturday: 10:00 AM - 2:00 PM</p>
+                          <p>Sunday: Closed</p>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
