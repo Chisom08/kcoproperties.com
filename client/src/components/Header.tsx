@@ -46,10 +46,7 @@ export default function Header() {
 
           {/* Right Side Actions */}
           <div className="hidden lg:flex items-center gap-4">
-            <a href="tel:+1234567890" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-              <Phone className="h-4 w-4" />
-              <span className="font-medium">(123) 456-7890</span>
-            </a>
+          
             
             {isAuthenticated ? (
               <>
@@ -112,10 +109,7 @@ export default function Header() {
               </Link>
               
               <div className="flex flex-col gap-2 pt-4 border-t border-gray-200">
-                <a href="tel:+1234567890" className="flex items-center gap-2 text-foreground py-2">
-                  <Phone className="h-4 w-4" />
-                  <span className="font-medium">(123) 456-7890</span>
-                </a>
+             
                 
                 {isAuthenticated ? (
                   <>
