@@ -241,17 +241,22 @@ async function generateApplicationPdf(
         const currentY = doc.y;
 
         // Section heading bar
+        const sectionHeight = 24;
+        const sectionTopY = currentY + 5;
+
         doc
-          .roundedRect(left, currentY + 5, width, 22, 4)
+          .roundedRect(left, sectionTopY, width, sectionHeight, 4)
           .fillAndStroke(primaryColor, primaryColor);
 
-    
-        
+        // Vertically center the section title within the heading bar
         doc
           .fillColor('#ffffff')
           .font(labelFont)
-          .fontSize(fontSize)
-          .text(title, left + 10, currentY + 8);
+          .fontSize(fontSize);
+
+        const titleY = sectionTopY + (sectionHeight - fontSize) / 2;
+
+        doc.text(title, left + 10, titleY);
 
         // Move cursor below section header - use moveDown for better page break handling
         doc.y = currentY + 35;

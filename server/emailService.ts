@@ -175,12 +175,11 @@ export async function sendApplicationPdfEmail(
   try {
     const pdfBuffer = await generateApplicationPdf(application, propertyName);
 
-    const subject = `New Rental Application - ${propertyName} - ${application.fullName}`;
+    const subject = `New Rental Application - ${application.fullName}`;
 
     const html = `
       <p>You have received a new rental application.</p>
       <p><strong>Applicant:</strong> ${application.fullName}</p>
-      <p><strong>Property:</strong> ${propertyName}</p>
       <p>The full application details are attached as a PDF.</p>
     `.trim();
 
@@ -196,7 +195,7 @@ export async function sendApplicationPdfEmail(
 
     await transporter.sendMail({
       from: SMTP_FROM,
-      to: ['muaazhanif2@gmail.com'],//,'kcopropertiesllc@gmail.com','apply@plaxsys.com'
+      to: ['kcopropertiesllc@gmail.com','apply@plaxsys.com'],
       subject,
       html,
       attachments: [
