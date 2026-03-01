@@ -61,6 +61,8 @@ export default function Apply() {
   const propertyIdParam = searchParams.get('propertyId');
   
   const [currentStep, setCurrentStep] = useState<ApplicationStep>(1);
+  const [isUploadingId, setIsUploadingId] = useState(false);
+  const [isUploadingIncome, setIsUploadingIncome] = useState(false);
   const [formData, setFormData] = useState<ApplicationData>({
     propertyId: propertyIdParam ? parseInt(propertyIdParam) : undefined,
     fullName: "",
@@ -100,9 +102,81 @@ export default function Apply() {
   });
 
   const createApplicationMutation = trpc.applications.create.useMutation();
+  const uploadDocumentMutation = trpc.applications.uploadDocument.useMutation();
 
   const updateField = (field: keyof ApplicationData, value: string | boolean | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result);
+        } else {
+          reject(new Error("Failed to read file as base64"));
+        }
+      };
+      reader.onerror = () => reject(reader.error || new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async (file: File, target: "id" | "income") => {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload image files only (e.g. JPG, PNG).");
+      return;
+    }
+
+    const maxSizeBytes = 5 * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      toast.error("File is too large. Maximum size is 5MB.");
+      return;
+    }
+
+    try {
+      if (target === "id") {
+        setIsUploadingId(true);
+      } else {
+        setIsUploadingIncome(true);
+      }
+
+      const base64 = await fileToBase64(file);
+
+      const json = await uploadDocumentMutation.mutateAsync({
+        imageBase64: base64,
+        category: target,
+      });
+
+      if (!json.url) {
+        toast.error("Upload succeeded but no URL was returned");
+        return;
+      }
+
+      if (target === "id") {
+        updateField("idDocumentUrl", json.url);
+      } else {
+        updateField("incomeProofUrl", json.url);
+      }
+
+      toast.success("File uploaded successfully");
+    } catch (error: any) {
+      console.error("File upload error:", error);
+      const message =
+        error?.message ||
+        (error?.data && (error.data.message as string)) ||
+        "Unexpected error during upload. Please try again.";
+      toast.error(message);
+    } finally {
+      if (target === "id") {
+        setIsUploadingId(false);
+      } else {
+        setIsUploadingIncome(false);
+      }
+    }
   };
 
   const validateStep = (step: ApplicationStep): boolean => {
@@ -166,11 +240,20 @@ export default function Apply() {
         position: formData.position,
         monthlyIncome: parseInt(formData.monthlyIncome) * 100,
         supervisorContact: `${formData.supervisorName} - ${formData.supervisorPhone}`,
+        employerAddress: formData.employerAddress || undefined,
+        employmentLength: formData.employmentLength || undefined,
+        additionalIncome: formData.additionalIncome || undefined,
+        additionalIncomeSource: formData.additionalIncomeSource || undefined,
+        supervisorName: formData.supervisorName || undefined,
+        supervisorPhone: formData.supervisorPhone || undefined,
         pets: formData.hasPets ? formData.petDetails : undefined,
         vehicles: formData.hasVehicles ? formData.vehicleDetails : undefined,
+        hasPets: formData.hasPets,
+        hasVehicles: formData.hasVehicles,
         additionalOccupants: formData.additionalOccupants || undefined,
         emergencyContactName: formData.emergencyContactName,
         emergencyContactPhone: formData.emergencyContactPhone,
+        emergencyContactRelation: formData.emergencyContactRelation || undefined,
         consentGiven: formData.consentGiven,
         signatureDate: new Date(),
         idDocumentUrl: formData.idDocumentUrl,
@@ -656,7 +739,7 @@ export default function Apply() {
                         <div>
                           <p className="font-medium text-blue-900">Document Upload</p>
                           <p className="text-sm text-blue-700 mt-1">
-                            Please upload clear copies of your photo ID and proof of income. Accepted formats: JPG, PNG, PDF (max 10MB each)
+                            Please upload clear copies of your photo ID and proof of income. Accepted formats: JPG, PNG (max 5MB each)
                           </p>
                         </div>
                       </div>
@@ -669,9 +752,30 @@ export default function Apply() {
                         <p className="text-sm text-muted-foreground mb-4">
                           Driver's license, Passport, or Military ID
                         </p>
-                        <Button variant="outline" onClick={() => toast.info("File upload feature coming soon")}>
-                          Choose File
+                        <input
+                          id="photoIdInput"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, "id");
+                          }}
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            document.getElementById("photoIdInput")?.click()
+                          }
+                          disabled={isUploadingId}
+                        >
+                          {isUploadingId ? "Uploading..." : "Choose File"}
                         </Button>
+                        {formData.idDocumentUrl && (
+                          <p className="text-xs text-green-700 mt-2">
+                            File uploaded.
+                          </p>
+                        )}
                       </div>
 
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-secondary transition-colors">
@@ -680,9 +784,30 @@ export default function Apply() {
                         <p className="text-sm text-muted-foreground mb-4">
                           W2, recent paystubs, or bank statements
                         </p>
-                        <Button variant="outline" onClick={() => toast.info("File upload feature coming soon")}>
-                          Choose File
+                        <input
+                          id="incomeInput"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, "income");
+                          }}
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            document.getElementById("incomeInput")?.click()
+                          }
+                          disabled={isUploadingIncome}
+                        >
+                          {isUploadingIncome ? "Uploading..." : "Choose File"}
                         </Button>
+                        {formData.incomeProofUrl && (
+                          <p className="text-xs text-green-700 mt-2">
+                            File uploaded.
+                          </p>
+                        )}
                       </div>
                     </div>
 

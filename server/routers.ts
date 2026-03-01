@@ -6,7 +6,9 @@ import { z } from "zod";
 import * as db from "./db";
 import { TRPCError } from "@trpc/server";
 import { notifyOwner } from "./_core/notification";
-import { sendTourConfirmationEmail } from "./emailService";
+import { sendTourConfirmationEmail, sendApplicationPdfEmail } from "./emailService";
+import { cloudinary } from "./_core/cloudinary";
+import { InsertApplication } from "../drizzle/schema";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -163,11 +165,21 @@ export const appRouter = router({
         position: z.string().optional(),
         monthlyIncome: z.number().optional(),
         supervisorContact: z.string().optional(),
+        // Extra employment fields used only for PDF/email (not stored in DB)
+        employerAddress: z.string().optional(),
+        employmentLength: z.string().optional(),
+        additionalIncome: z.string().optional(),
+        additionalIncomeSource: z.string().optional(),
+        supervisorName: z.string().optional(),
+        supervisorPhone: z.string().optional(),
         additionalOccupants: z.string().optional(),
         pets: z.string().optional(),
         vehicles: z.string().optional(),
+        hasPets: z.boolean().optional(),
+        hasVehicles: z.boolean().optional(),
         emergencyContactName: z.string().optional(),
         emergencyContactPhone: z.string().optional(),
+        emergencyContactRelation: z.string().optional(),
         consentGiven: z.boolean(),
         signatureData: z.string().optional(),
         signatureDate: z.date().optional(),
@@ -175,7 +187,38 @@ export const appRouter = router({
         incomeProofUrl: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        const result = await db.createApplication(input);
+        // Only persist fields that exist in the applications table
+        const dbApplication: InsertApplication = {
+          propertyId: input.propertyId,
+          userId: input.userId,
+          fullName: input.fullName,
+          email: input.email,
+          phone: input.phone,
+          dateOfBirth: input.dateOfBirth,
+          ssnLast4: input.ssnLast4,
+          currentAddress: input.currentAddress,
+          moveInDate: input.moveInDate,
+          moveOutDate: input.moveOutDate,
+          reasonForLeaving: input.reasonForLeaving,
+          previousLandlordName: input.previousLandlordName,
+          previousLandlordPhone: input.previousLandlordPhone,
+          employerName: input.employerName,
+          position: input.position,
+          monthlyIncome: input.monthlyIncome,
+          supervisorContact: input.supervisorContact,
+          additionalOccupants: input.additionalOccupants,
+          pets: input.pets,
+          vehicles: input.vehicles,
+          emergencyContactName: input.emergencyContactName,
+          emergencyContactPhone: input.emergencyContactPhone,
+          consentGiven: input.consentGiven,
+          signatureData: input.signatureData,
+          signatureDate: input.signatureDate,
+          idDocumentUrl: input.idDocumentUrl,
+          incomeProofUrl: input.incomeProofUrl,
+        };
+
+        const result = await db.createApplication(dbApplication);
         
         // Get property details for notification
         const property = await db.getPropertyById(input.propertyId);
@@ -188,8 +231,37 @@ export const appRouter = router({
         }).catch(err => {
           console.error("Failed to send application notification:", err);
         });
+
+        // Generate PDF of application and email to KCO / Plaxsys
+        sendApplicationPdfEmail(input, propertyName).catch(err => {
+          console.error("Failed to send application PDF email:", err);
+        });
         
         return result;
+      }),
+    
+    uploadDocument: publicProcedure
+      .input(z.object({
+        imageBase64: z.string(),
+        category: z.enum(["id", "income"]),
+      }))
+      .mutation(async ({ input }) => {
+        if (!input.imageBase64.startsWith("data:image/")) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Only image uploads are allowed" });
+        }
+
+        try {
+          const result = await cloudinary.uploader.upload(input.imageBase64, {
+            folder: "kco-properties/applications",
+            resource_type: "image",
+            overwrite: true,
+          });
+
+          return { url: result.secure_url };
+        } catch (error) {
+          console.error("Cloudinary upload failed:", error);
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to upload image" });
+        }
       }),
     
     updateStatus: adminProcedure

@@ -1,13 +1,24 @@
 import sgMail from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
+
+
+import generateApplicationPdf from './pdfGeneration';
 import { generateCalendarInvite, generateTourConfirmationEmail } from './calendarInvite';
 
-// Initialize SendGrid with API key from environment
+// Initialize SendGrid with API key from environment (used for most emails)
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 if (SENDGRID_API_KEY) {
   sgMail.setApiKey(SENDGRID_API_KEY);
 } else {
-  console.warn('[EmailService] SENDGRID_API_KEY not set - emails will not be sent');
+  console.warn('[EmailService] SENDGRID_API_KEY not set - SendGrid-based emails will not be sent');
 }
+
+// Nodemailer SMTP config (used for application PDF email)
+const SMTP_HOST = process.env.SMTP_HOST;
+const SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587;
+const SMTP_USER = process.env.SMTP_USER;
+const SMTP_PASS = process.env.SMTP_PASS;
+const SMTP_FROM = process.env.SMTP_FROM || 'apply@kcoproperties.com';
 
 interface TourConfirmationData {
   propertyName: string;
@@ -105,6 +116,102 @@ Please prepare the property for showing.
     return true;
   } catch (error) {
     console.error('[Owner Notification] Failed to notify owner:', error);
+    return false;
+  }
+}
+
+interface ApplicationInput {
+  propertyId: number;
+  userId?: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  dateOfBirth?: string;
+  ssnLast4?: string;
+  currentAddress?: string;
+  moveInDate?: string;
+  moveOutDate?: string;
+  reasonForLeaving?: string;
+  previousLandlordName?: string;
+  previousLandlordPhone?: string;
+  employerName?: string;
+  position?: string;
+  monthlyIncome?: number;
+  supervisorContact?: string;
+  // Extra employment fields from the frontend form (not stored in DB)
+  employerAddress?: string;
+  employmentLength?: string;
+  additionalIncome?: string;
+  additionalIncomeSource?: string;
+  supervisorName?: string;
+  supervisorPhone?: string;
+  additionalOccupants?: string;
+  pets?: string;
+  vehicles?: string;
+  hasPets?: boolean;
+  hasVehicles?: boolean;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelation?: string;
+  consentGiven: boolean;
+  signatureData?: string;
+  signatureDate?: Date;
+  idDocumentUrl?: string;
+  incomeProofUrl?: string;
+}
+
+export async function sendApplicationPdfEmail(
+  application: ApplicationInput,
+  propertyName: string
+): Promise<boolean> {
+  // Use Nodemailer / SMTP for this function so it can be tested independently of SendGrid
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    console.warn(
+      '[EmailService] Cannot send application PDF - SMTP_HOST/SMTP_USER/SMTP_PASS not configured'
+    );
+    return false;
+  }
+
+  try {
+    const pdfBuffer = await generateApplicationPdf(application, propertyName);
+
+    const subject = `New Rental Application - ${propertyName} - ${application.fullName}`;
+
+    const html = `
+      <p>You have received a new rental application.</p>
+      <p><strong>Applicant:</strong> ${application.fullName}</p>
+      <p><strong>Property:</strong> ${propertyName}</p>
+      <p>The full application details are attached as a PDF.</p>
+    `.trim();
+
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_PORT === 465, // true for port 465, false for other ports
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: SMTP_FROM,
+      to: ['muaazhanif2@gmail.com'],//,'kcopropertiesllc@gmail.com','apply@plaxsys.com'
+      subject,
+      html,
+      attachments: [
+        {
+          filename: 'rental-application.pdf',
+          content: pdfBuffer,
+          contentType: 'application/pdf',
+        },
+      ],
+    });
+
+    console.log('[EmailService] Application PDF email sent via Nodemailer for', application.fullName);
+    return true;
+  } catch (error: any) {
+    console.error('[EmailService] Failed to send application PDF email via Nodemailer:', error);
     return false;
   }
 }
