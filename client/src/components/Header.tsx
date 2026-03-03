@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { APP_LOGO, getLoginUrl } from "@/const";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -6,6 +6,9 @@ import { Menu, X, Phone } from "lucide-react";
 import { useState } from "react";
 
 export default function Header() {
+  const [location] = useLocation();
+  const isCorporateLeasePage = location === "/corporate-lease";
+  const isApplyCorporateLeaseForm = location === "/apply"
   const { user, isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -67,12 +70,13 @@ export default function Header() {
                 <Button variant="outline">Tenant Login</Button>
               </a>
             )}
-            
-            <Link href="/apply">
-              <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
-                Apply Now
-              </Button>
-            </Link>
+            {!isCorporateLeasePage &&  !isApplyCorporateLeaseForm &&(
+              <Link href="/">
+                <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
+                  Apply Now
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -130,12 +134,14 @@ export default function Header() {
                     <Button variant="outline" className="w-full">Tenant Login</Button>
                   </a>
                 )}
-                
-                <Link href="/apply">
-                  <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
-                    Apply Now
-                  </Button>
-                </Link>
+
+                {!isCorporateLeasePage && !isApplyCorporateLeaseForm && (
+                  <Link href="/">
+                    <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
+                      Apply Now
+                    </Button>
+                  </Link>
+                )}
               </div>
             </nav>
           </div>

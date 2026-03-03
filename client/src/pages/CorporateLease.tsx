@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -196,10 +197,11 @@ export default function CorporateLease() {
                 Energy efficiency simply means using less energy to perform the same task – that is, 
                 eliminating energy waste. Energy efficiency brings a variety of ecological benefits.
               </p>
+              <Link href="/apply">
               <Button className="bg-[#E89B3C] hover:bg-[#d88a2b] text-white px-8 py-6 text-lg">
-                <Download className="mr-2 h-5 w-5" />
-                Download
+                 Apply Now
               </Button>
+              </Link>
             </div>
 
             <div className="relative">
