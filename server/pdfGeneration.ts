@@ -115,7 +115,7 @@ async function generateApplicationPdf(
     : null;
 
   return new Promise((resolve, reject) => {
-      const doc = new PDFDocument({ margin: 50 });
+      const doc = new PDFDocument({ margin: 20 });
       const chunks: Buffer[] = [];
   
       doc.on('data', (chunk: Buffer) => chunks.push(chunk));
@@ -149,7 +149,7 @@ async function generateApplicationPdf(
       const pageWidth =
         doc.page.width - doc.page.margins.left - doc.page.margins.right;
       const pageHeight = doc.page.height;
-      const bottomMargin = 50; // Space reserved at bottom of page
+      const bottomMargin = 0; // Space reserved at bottom of page
 
       // Helper to parse the combined currentAddress string into components
       // Format from the form: `${street}, ${city}, ${state} ${zip}`
@@ -206,10 +206,10 @@ async function generateApplicationPdf(
       doc
         .fillColor(primaryColor)
         .font(labelFont)
-        .fontSize(8)
-        .text('KCO PROPERTIES, LLC.', { align: 'center' });
+        .fontSize(10)
+        .text('PROPERTIES, LLC.', { align: 'center' });
 
-      doc.moveDown(0.2);
+        doc.moveDown(1.2);
 
       doc
         .fillColor(labelColor)
@@ -219,16 +219,16 @@ async function generateApplicationPdf(
 
       doc.moveDown(0.4);
 
-      doc.moveDown(1.2);
+     
 
       // Divider line
-      doc
-        .moveTo(doc.page.margins.left, doc.y)
-        .lineTo(doc.page.margins.left + pageWidth, doc.y)
-        .strokeColor('#dddddd')
-        .stroke();
+      // doc
+      //   .moveTo(doc.page.margins.left, doc.y)
+      //   .lineTo(doc.page.margins.left + pageWidth, doc.y)
+      //   .strokeColor('#dddddd')
+      //   .stroke();
 
-      doc.moveDown(1);
+      // doc.moveDown(1);
 
       const addSection = (title: string, body: () => void) => {
         // Check if we need a new page before adding section (reserve ~50px for section header)
@@ -277,7 +277,7 @@ async function generateApplicationPdf(
           .fillColor(labelColor)
           .font(labelFont)
           .fontSize(fontSize)
-          .text(`${label}: `, {
+          .text(`${label}:            `, {
             continued: true,
           });
 
@@ -302,6 +302,10 @@ async function generateApplicationPdf(
         const columnGap = 30;
         const colWidth = (pageWidth - columnGap) / 2;
         const yStart = doc.y;
+        
+        // Fixed spacing: label ends here, value starts here
+        const labelWidth = 130; // Fixed width for label area (adjust as needed)
+        const valueStartOffset = 10; // Space between label and value
 
         const renderColumn = (
           x: number,
@@ -315,22 +319,40 @@ async function generateApplicationPdf(
               ? ''
               : String(value);
 
+          // Render label at fixed width
           doc
             .fillColor(labelColor)
             .font(labelFont)
             .fontSize(fontSize)
-            .text(`${label}: `, x, doc.y, {
-              continued: true,
-              width: colWidth,
+            .text(`${label}:`, x, yStart, {
+              width: labelWidth,
             });
+          const labelYAfter = doc.y;
 
+          // Render value at fixed X position (aligned across all rows)
+          const valueX = x + labelWidth + valueStartOffset;
+          const valueWidth = colWidth - labelWidth - valueStartOffset;
+          
+          // Set cursor to value position and render (this allows proper Y tracking)
+          doc.y = yStart;
+          const yBeforeValue = doc.y;
+          
+          // Move to value X position
+          doc.x = valueX;
+          
+          // Render value - using current cursor position so wrapping is tracked
           doc
             .fillColor(textColor)
             .font(valueFont)
             .fontSize(fontSize)
-            .text(displayValue || ' ', { width: colWidth });
+            .text(displayValue || ' ', {
+              width: valueWidth,
+            });
+          
+          const valueYAfter = doc.y;
 
-          return doc.y;
+          // Return the maximum Y position (bottom of whichever wrapped further)
+          return Math.max(labelYAfter, valueYAfter);
         };
 
         // Left column
@@ -422,29 +444,64 @@ async function generateApplicationPdf(
 
       const checkboxLine = (checked: boolean, label: string) => {
         const box = checked ? '[x]' : '[ ]';
+        const left = doc.page.margins.left;
+        const labelWidth = 130; // Match the label width used in fieldRow
+        
         doc
-          .fillColor(textColor)
+          .fillColor(labelColor)
           .font(labelFont)
           .fontSize(fontSize)
-          .text(`${box} ${label}`);
+          .text(`${box} ${label}`, left, doc.y, {
+            width: labelWidth,
+          });
         doc.moveDown(0.3);
       };
 
-      // Check if we have enough space for "Additional Information" heading and both checkboxes
-      // Estimate: 0.5 moveDown + heading text (~15pt) + 0.4 moveDown + checkbox1 (~15pt) + 0.3 moveDown + checkbox2 (~15pt) ≈ 60pt
-      checkPageBreak(60);
+      // Check if we have enough space for "Additional Information" heading, both checkboxes, and potential details
+      // Estimate: 0.5 moveDown + heading text (~15pt) + 0.4 moveDown + checkbox1 (~15pt) + 0.3 moveDown + checkbox2 (~15pt) + details (~40pt) ≈ 100pt
+      const estimatedDetailsHeight = (hasPets && application.pets?.trim() ? 40 : 0) + (hasVehicles && application.vehicles?.trim() ? 40 : 0);
+      checkPageBreak(60 + estimatedDetailsHeight);
 
       // Additional Information heading
       doc.moveDown(0.5);
+      const left = doc.page.margins.left;
+      const labelWidth = 130; // Match the label width used in fieldRow
       doc
         .fillColor(primaryColor)
         .font(labelFont)
         .fontSize(fontSize)
-        .text('Additional Information');
+        .text('Additional Information', left, doc.y, {
+          width: labelWidth,
+        });
       doc.moveDown(0.4);
 
       checkboxLine(!!hasPets, 'I have pets');
+      // Show pet details if provided
+      if (hasPets && application.pets && application.pets.trim() !== '') {
+        doc.moveDown(0.2);
+        doc
+          .fillColor(textColor)
+          .font(valueFont)
+          .fontSize(fontSize - 1)
+          .text(`Pet Details: ${application.pets}`, {
+            indent: 20,
+          });
+        doc.moveDown(0.3);
+      }
+
       checkboxLine(!!hasVehicles, 'I have vehicles');
+      // Show vehicle details if provided
+      if (hasVehicles && application.vehicles && application.vehicles.trim() !== '') {
+        doc.moveDown(0.2);
+        doc
+          .fillColor(textColor)
+          .font(valueFont)
+          .fontSize(fontSize - 1)
+          .text(`Vehicle Details: ${application.vehicles}`, {
+            indent: 20,
+          });
+        doc.moveDown(0.3);
+      }
       });
 
       // Additional Occupants
@@ -512,6 +569,10 @@ async function generateApplicationPdf(
         };
 
         drawImageIfAvailable('Photo ID:', idDocumentBuffer, application.idDocumentUrl);
+        // Add extra spacing between images
+        // if (idDocumentBuffer) {
+        //   doc.moveDown(0.5);
+        // }
         drawImageIfAvailable('Proof of Income:', incomeProofBuffer, application.incomeProofUrl);
       });
   
