@@ -483,7 +483,7 @@ async function generateApplicationPdf(
           .fillColor(textColor)
           .font(valueFont)
           .fontSize(fontSize - 1)
-          .text(`Pet Details: ${application.pets}`, {
+          .text(`${application.pets}`, {
             indent: 20,
           });
         doc.moveDown(0.3);
@@ -497,7 +497,7 @@ async function generateApplicationPdf(
           .fillColor(textColor)
           .font(valueFont)
           .fontSize(fontSize - 1)
-          .text(`Vehicle Details: ${application.vehicles}`, {
+          .text(`${application.vehicles}`, {
             indent: 20,
           });
         doc.moveDown(0.3);
