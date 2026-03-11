@@ -188,3 +188,120 @@
     }
   }
 }
+
+/* KCO Custom Utility Classes */
+.kco-teal { color: #0099CC; }
+.kco-red { color: #CC0000; }
+.bg-kco-teal { background-color: #0099CC; }
+.bg-kco-red { background-color: #CC0000; }
+.border-kco-teal { border-color: #0099CC; }
+
+/* Omia ChatBot Badge */
+.omia-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #0099CC;
+  color: white;
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+/* Bot message */
+.bot-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  animation: slideInUp 0.3s ease-out;
+}
+
+.bot-message-text {
+  color: #0099CC;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-in { animation: slideInUp 0.35s ease-out; }
+.animate-fade-in { animation: fadeIn 0.3s ease-out; }
+
+/* Note box */
+.note-box {
+  background-color: #FFF3CD;
+  border-left: 3px solid #FFC107;
+  padding: 0.5rem 0.75rem;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #664d03;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 1rem;
+}
+
+/* Upload button */
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px dashed #0099CC;
+  border-radius: 6px;
+  color: #0099CC;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+  background: transparent;
+}
+
+.upload-btn:hover { background-color: rgba(0, 153, 204, 0.08); }
+
+/* Section heading */
+.section-heading {
+  color: #CC0000;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+
+/* Add button */
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: #0099CC;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.add-btn:hover { background-color: #007BA3; }
+
+/* Signature canvas */
+.signature-canvas {
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  cursor: crosshair;
+  touch-action: none;
+  background: white;
+}

@@ -4,6 +4,19 @@ import nodemailer from 'nodemailer';
 
 import generateApplicationPdf from './pdfGeneration';
 import { generateCalendarInvite, generateTourConfirmationEmail } from './calendarInvite';
+import {
+  buildApplicationReceiptHtml,
+  buildApplicationReceiptText,
+  buildResumeLinkHtml,
+  buildAdminPaymentHtml,
+  buildAdminPaymentText,
+  type ApplicationReceiptData,
+  type ResumeLinkData,
+  type AdminPaymentNotificationData,
+} from './rentalEmailTemplates';
+
+// Re-export types for convenience
+export type { ApplicationReceiptData, ResumeLinkData, AdminPaymentNotificationData };
 
 // Initialize SendGrid with API key from environment (used for most emails)
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
@@ -211,6 +224,127 @@ export async function sendApplicationPdfEmail(
     return true;
   } catch (error: any) {
     console.error('[EmailService] Failed to send application PDF email via Nodemailer:', error);
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rental App Email Functions
+// ---------------------------------------------------------------------------
+
+/**
+ * Send application receipt email (rental app feature)
+ */
+export async function sendApplicationReceipt(data: ApplicationReceiptData): Promise<boolean> {
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    console.warn('[EmailService] Cannot send application receipt - SMTP not configured');
+    return false;
+  }
+
+  if (!data.applicantEmail) {
+    console.warn('[EmailService] Cannot send receipt — applicant email is missing.');
+    return false;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_PORT === 465,
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: SMTP_FROM,
+      to: data.applicantEmail,
+      subject: `Application Received — KCO Properties (#${data.applicationId})`,
+      text: buildApplicationReceiptText(data),
+      html: buildApplicationReceiptHtml(data),
+    });
+
+    console.log(`[EmailService] Receipt sent to ${data.applicantEmail} for application #${data.applicationId}`);
+    return true;
+  } catch (err) {
+    console.error('[EmailService] Failed to send application receipt:', err);
+    return false;
+  }
+}
+
+/**
+ * Send resume link email (rental app feature)
+ */
+export async function sendResumeLink(data: ResumeLinkData): Promise<boolean> {
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    console.warn('[EmailService] Cannot send resume link - SMTP not configured');
+    return false;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_PORT === 465,
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: SMTP_FROM,
+      to: data.applicantEmail,
+      subject: `Resume Your KCO Properties Application #${data.applicationId}`,
+      html: buildResumeLinkHtml(data),
+      text: `Dear ${data.applicantName},\n\nHere is your resume link for your KCO Properties rental application (#${data.applicationId}):\n\n${data.resumeUrl}\n\nKeep this link private — anyone with it can access your application.\n\nQuestions? Email clientcare@kcoproperties.com or call (901) 607-1891.\n\n© ${new Date().getFullYear()} KCO Properties, LLC`,
+    });
+
+    console.log(`[EmailService] Resume link sent to ${data.applicantEmail} for application #${data.applicationId}`);
+    return true;
+  } catch (err) {
+    console.error('[EmailService] Failed to send resume link email:', err);
+    return false;
+  }
+}
+
+/**
+ * Send admin payment notification email (rental app feature)
+ */
+export async function sendAdminPaymentNotification(data: AdminPaymentNotificationData): Promise<boolean> {
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    console.warn('[EmailService] Cannot send admin payment notification - SMTP not configured');
+    return false;
+  }
+
+  const ADMIN_PAYMENT_EMAIL = process.env.ADMIN_PAYMENT_EMAIL || 'payment@kcoproperties.com';
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_PORT === 465,
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS,
+      },
+    });
+
+    const amountFormatted = `$${(data.paymentAmount / 100).toFixed(2)}`;
+
+    await transporter.sendMail({
+      from: SMTP_FROM,
+      to: ADMIN_PAYMENT_EMAIL,
+      subject: `[KCO Admin] Payment Received — ${amountFormatted} — Application #${data.applicationId} (${data.applicantName})`,
+      text: buildAdminPaymentText(data),
+      html: buildAdminPaymentHtml(data),
+    });
+
+    console.log(`[EmailService] Admin payment notification sent to ${ADMIN_PAYMENT_EMAIL} for application #${data.applicationId}`);
+    return true;
+  } catch (err) {
+    console.error('[EmailService] Failed to send admin payment notification:', err);
     return false;
   }
 }

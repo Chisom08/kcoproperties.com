@@ -9,6 +9,10 @@ import { notifyOwner } from "./_core/notification";
 import { sendTourConfirmationEmail, sendApplicationPdfEmail } from "./emailService";
 import { cloudinary } from "./_core/cloudinary";
 import { InsertApplication } from "../drizzle/schema";
+import { applicationRouter } from "./routers/rental/application";
+import { chatbotRouter } from "./routers/rental/chatbot";
+import { uploadRouter } from "./routers/rental/upload";
+import { paymentRouter } from "./routers/rental/payment";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -507,6 +511,14 @@ export const appRouter = router({
         await db.deleteUnit(input.id);
         return { success: true };
       }),
+  }),
+
+  // Rental app feature module routers
+  rental: router({
+    application: applicationRouter,
+    chatbot: chatbotRouter,
+    upload: uploadRouter,
+    payment: paymentRouter,
   }),
 });
 

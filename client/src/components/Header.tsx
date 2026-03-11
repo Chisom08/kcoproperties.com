@@ -71,7 +71,7 @@ export default function Header() {
               </a>
             )}
             {!isCorporateLeasePage &&  !isApplyCorporateLeaseForm &&(
-              <Link href="/">
+              <Link href="/rental">
                 <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
                   Apply Now
                 </Button>
