@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, decimal } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, decimal, json } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -298,3 +298,176 @@ export const units = mysqlTable("units", {
 
 export type Unit = typeof units.$inferSelect;
 export type InsertUnit = typeof units.$inferInsert;
+
+/**
+ * Co-Applicants table - for rental applications
+ */
+export const coApplicants = mysqlTable("co_applicants", {
+  id: int("id").autoincrement().primaryKey(),
+  applicationId: int("applicationId").notNull(),
+  firstName: varchar("firstName", { length: 100 }),
+  lastName: varchar("lastName", { length: 100 }),
+  ssn: varchar("ssn", { length: 20 }),
+  dateOfBirth: varchar("dateOfBirth", { length: 20 }),
+  maritalStatus: mysqlEnum("maritalStatus", ["single", "married", "divorced"]),
+  cellPhone: varchar("cellPhone", { length: 20 }),
+  workPhone: varchar("workPhone", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+  dlState: varchar("dlState", { length: 2 }),
+  dlNumber: varchar("dlNumber", { length: 50 }),
+  dlFrontUrl: text("dlFrontUrl"),
+  dlBackUrl: text("dlBackUrl"),
+  currentStreet: text("currentStreet"),
+  currentCity: varchar("currentCity", { length: 100 }),
+  currentState: varchar("currentState", { length: 2 }),
+  currentZip: varchar("currentZip", { length: 10 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CoApplicant = typeof coApplicants.$inferSelect;
+export type InsertCoApplicant = typeof coApplicants.$inferInsert;
+
+/**
+ * Vehicles table - for rental applications
+ */
+export const vehicles = mysqlTable("vehicles", {
+  id: int("id").autoincrement().primaryKey(),
+  applicationId: int("applicationId").notNull(),
+  make: varchar("make", { length: 100 }),
+  model: varchar("model", { length: 100 }),
+  color: varchar("color", { length: 50 }),
+  year: varchar("year", { length: 4 }),
+  licensePlate: varchar("licensePlate", { length: 20 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Vehicle = typeof vehicles.$inferSelect;
+export type InsertVehicle = typeof vehicles.$inferInsert;
+
+/**
+ * Rental Applications table - for the rental app feature module
+ * This is separate from the main applications table to avoid schema conflicts
+ */
+export const rentalApplications = mysqlTable("rental_applications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  status: mysqlEnum("status", ["draft", "submitted", "approved", "rejected", "pending", "under_review", "denied", "incomplete"]).default("draft").notNull(),
+
+  // Property
+  propertyAddress: text("propertyAddress"),
+
+  // Personal Info
+  firstName: varchar("firstName", { length: 100 }),
+  lastName: varchar("lastName", { length: 100 }),
+  ssn: varchar("ssn", { length: 20 }),
+  dateOfBirth: varchar("dateOfBirth", { length: 20 }),
+  maritalStatus: mysqlEnum("maritalStatus", ["single", "married", "divorced"]),
+  cellPhone: varchar("cellPhone", { length: 20 }),
+  workPhone: varchar("workPhone", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+
+  // Driver's License
+  dlState: varchar("dlState", { length: 2 }),
+  dlNumber: varchar("dlNumber", { length: 50 }),
+  dlFrontUrl: text("dlFrontUrl"),
+  dlBackUrl: text("dlBackUrl"),
+
+  // Current Residence
+  currentStreet: text("currentStreet"),
+  currentCity: varchar("currentCity", { length: 100 }),
+  currentState: varchar("currentState", { length: 2 }),
+  currentZip: varchar("currentZip", { length: 10 }),
+
+  // Reason for moving
+  reasonForMoving: varchar("reasonForMoving", { length: 100 }),
+
+  // Employment
+  employerName: text("employerName"),
+  employerStreet: text("employerStreet"),
+  employerCity: varchar("employerCity", { length: 100 }),
+  employerState: varchar("employerState", { length: 2 }),
+  employerZip: varchar("employerZip", { length: 10 }),
+  position: varchar("position", { length: 100 }),
+  officePhone: varchar("officePhone", { length: 20 }),
+  monthlyGrossPay: varchar("monthlyGrossPay", { length: 50 }),
+  supervisorName: varchar("supervisorName", { length: 200 }),
+  supervisorPhone: varchar("supervisorPhone", { length: 20 }),
+  additionalIncome: text("additionalIncome"),
+  employmentFrom: varchar("employmentFrom", { length: 20 }),
+  employmentTo: varchar("employmentTo", { length: 20 }),
+  incomeProofUrls: json("incomeProofUrls").$type<string[]>(),
+
+  // Emergency Contact
+  emergencyName: varchar("emergencyName", { length: 200 }),
+  emergencyRelationship: varchar("emergencyRelationship", { length: 100 }),
+  emergencyPhone: varchar("emergencyPhone", { length: 20 }),
+  emergencyEmail: varchar("emergencyEmail", { length: 320 }),
+  emergencyAddress: text("emergencyAddress"),
+  emergencyCity: varchar("emergencyCity", { length: 100 }),
+  emergencyState: varchar("emergencyState", { length: 2 }),
+  emergencyZip: varchar("emergencyZip", { length: 10 }),
+
+  // Medical Contact
+  medicalName: varchar("medicalName", { length: 200 }),
+  medicalPhone: varchar("medicalPhone", { length: 20 }),
+  medicalEmail: varchar("medicalEmail", { length: 320 }),
+  medicalAddress: text("medicalAddress"),
+  medicalCity: varchar("medicalCity", { length: 100 }),
+  medicalZip: varchar("medicalZip", { length: 10 }),
+
+  // General Information (Yes/No questions + explanations)
+  beenSued: varchar("beenSued", { length: 3 }),
+  beenSued_explanation: text("beenSued_explanation"),
+  brokenLease: varchar("brokenLease", { length: 3 }),
+  brokenLease_explanation: text("brokenLease_explanation"),
+  convictedFelony: varchar("convictedFelony", { length: 3 }),
+  convictedFelony_explanation: text("convictedFelony_explanation"),
+  moveInAmountAvailable: varchar("moveInAmountAvailable", { length: 3 }),
+  moveInAmount_explanation: text("moveInAmount_explanation"),
+  filedBankruptcy: varchar("filedBankruptcy", { length: 3 }),
+  filedBankruptcy_explanation: text("filedBankruptcy_explanation"),
+  bankruptcyDischarged: varchar("bankruptcyDischarged", { length: 3 }),
+  rentPlanDuration: text("rentPlanDuration"),
+  lockedOutBySheriff: varchar("lockedOutBySheriff", { length: 3 }),
+  lockedOutBySheriff_explanation: text("lockedOutBySheriff_explanation"),
+  servedLateRentNote: varchar("servedLateRentNote", { length: 3 }),
+  servedLateRentNote_explanation: text("servedLateRentNote_explanation"),
+  occupantsSmoke: varchar("occupantsSmoke", { length: 3 }),
+  occupantsSmoke_explanation: text("occupantsSmoke_explanation"),
+  landlordProblems: varchar("landlordProblems", { length: 3 }),
+  landlordProblemsExplanation: text("landlordProblemsExplanation"),
+  additionalIncomeSource: text("additionalIncomeSource"),
+  creditCheckComment: text("creditCheckComment"),
+  petsInfo: text("petsInfo"),
+  howHeardAboutHome: text("howHeardAboutHome"),
+
+  // Authentication
+  passwordHash: varchar("passwordHash", { length: 100 }),
+
+  // Stripe Payment
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 100 }),
+  stripeCheckoutSessionId: varchar("stripeCheckoutSessionId", { length: 100 }),
+  paymentStatus: mysqlEnum("paymentStatus", ["unpaid", "paid", "refunded"]).default("unpaid"),
+  paymentAmount: int("paymentAmount"),
+
+  // Signature
+  signatureName: varchar("signatureName", { length: 200 }),
+  signatureDrawUrl: text("signatureDrawUrl"),
+  signatureDate: varchar("signatureDate", { length: 30 }),
+
+  // Current step for resume
+  currentStep: int("currentStep").default(1),
+
+  // Save & Resume Later — unique token for passwordless resume link
+  resumeToken: varchar("resumeToken", { length: 64 }),
+  resumeTokenExpiresAt: timestamp("resumeTokenExpiresAt"),
+  // Automated reminder email — set when the 7-day nudge has been sent
+  reminderSentAt: timestamp("reminderSentAt"),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  submittedAt: timestamp("submittedAt"),
+});
+
+export type RentalApplication = typeof rentalApplications.$inferSelect;
+export type InsertRentalApplication = typeof rentalApplications.$inferInsert;

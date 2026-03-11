@@ -232,6 +232,10 @@ BUILT_IN_FORGE_API_KEY=your_forge_api_key
 # Analytics (optional)
 VITE_ANALYTICS_ENDPOINT=your_analytics_endpoint
 VITE_ANALYTICS_WEBSITE_ID=your_website_id
+
+# Stripe Payment Configuration
+STRIPE_SECRET_KEY=sk_live_your_stripe_secret_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_signing_secret_here
 ```
 
 **Important Notes:**
@@ -240,6 +244,8 @@ VITE_ANALYTICS_WEBSITE_ID=your_website_id
 - Generate a secure JWT_SECRET: `openssl rand -base64 32`
 - Keep this file secure and never commit it to version control
 - Ensure SENDGRID_FROM_EMAIL matches your verified sender in SendGrid
+- For Stripe setup, see `STRIPE_SETUP.md` for detailed instructions
+- Use test keys (`sk_test_...`) for development, live keys (`sk_live_...`) for production
 
 ### 3. Set File Permissions
 

@@ -190,6 +190,15 @@ The website uses Manus OAuth for authentication. The first user to log in with t
 3. Create API key with "Mail Send" permissions
 4. Add API key to `.env` file
 
+## Stripe Payment Setup
+
+1. Sign up at [Stripe](https://stripe.com)
+2. Get your API keys from Stripe Dashboard → Developers → API keys
+3. Set up webhook endpoint (see `STRIPE_SETUP.md` for detailed instructions)
+4. Add keys to `.env` file
+
+**For detailed Stripe configuration, see `STRIPE_SETUP.md`**
+
 ## Common Commands
 
 ```bash

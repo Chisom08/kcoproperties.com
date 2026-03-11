@@ -66,7 +66,7 @@ export default function Home() {
                   View Available Rentals
                 </Button>
               </Link>
-              <Link href="/apply">
+              <Link href="/rental">
                 <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-6 text-lg">
                   Apply Now
                 </Button>
