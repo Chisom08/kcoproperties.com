@@ -273,6 +273,61 @@ export async function sendApplicationReceipt(data: ApplicationReceiptData): Prom
   }
 }
 
+/** Staff recipients for rental application PDF */
+const RENTAL_PDF_STAFF_EMAILS = ['muaazhanif2@gmail.com'];///'apply@kcoproperties.com', 'kcopropertiesllc@gmail.com'
+
+export interface RentalApplicationPdfEmailData {
+  applicationId: number;
+  applicantName: string;
+  applicantEmail?: string | null;
+  pdfBuffer: Buffer;
+}
+
+/**
+ * Email the rental application PDF to KCO staff (fire-and-forget from submit).
+ * Uses same SMTP as application receipt.
+ */
+export async function sendRentalApplicationPdfToStaff(data: RentalApplicationPdfEmailData): Promise<boolean> {
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    console.warn('[EmailService] Cannot send rental application PDF - SMTP not configured');
+    return false;
+  }
+
+  try {
+    const safeName = (data.applicantName || 'Applicant').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 40);
+    const filename = `KCO_Rental_Application_${data.applicationId}_${safeName}.pdf`;
+
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_PORT === 465,
+      auth: { user: SMTP_USER, pass: SMTP_PASS },
+    });
+
+    await transporter.sendMail({
+      from: SMTP_FROM,
+      to: RENTAL_PDF_STAFF_EMAILS,
+      subject: `New Rental Application Submitted — #${data.applicationId} — ${data.applicantName}`,
+      html: `
+        <p>A new rental application has been submitted.</p>
+        <p><strong>Applicant:</strong> ${data.applicantName}</p>
+        ${data.applicantEmail ? `<p><strong>Email:</strong> ${data.applicantEmail}</p>` : ''}
+        <p><strong>Application ID:</strong> #${data.applicationId}</p>
+        <p>The complete application form is attached as a PDF.</p>
+      `.trim(),
+      attachments: [
+        { filename, content: data.pdfBuffer, contentType: 'application/pdf' },
+      ],
+    });
+
+    console.log(`[EmailService] Rental application PDF sent to staff for application #${data.applicationId}`);
+    return true;
+  } catch (err) {
+    console.error('[EmailService] Failed to send rental application PDF to staff:', err);
+    return false;
+  }
+}
+
 /**
  * Send resume link email (rental app feature)
  */

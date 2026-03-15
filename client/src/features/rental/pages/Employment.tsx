@@ -99,13 +99,14 @@ export default function Employment() {
         additionalIncome: savedApplication.additionalIncome || prev.additionalIncome,
         employmentFrom: savedApplication.employmentFrom || prev.employmentFrom,
         employmentTo: savedApplication.employmentTo || prev.employmentTo,
+        incomeProofUrls: Array.isArray(savedApplication.incomeProofUrls)
+          ? savedApplication.incomeProofUrls
+          : prev.incomeProofUrls,
         // Landlord fields are not yet on the application schema; keep previous/local state
         landlordName: prev.landlordName,
         landlordPhone: prev.landlordPhone,
         landlordEmail: prev.landlordEmail,
         landlordAddress: prev.landlordAddress,
-        // Note: incomeProofUrls would need to be stored separately or retrieved from another source
-        // For now, we'll leave it empty and let users re-upload if needed
       }));
 
       setDataLoaded(true);

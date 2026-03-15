@@ -4,7 +4,8 @@ import { getDb } from "../../db";
 import { rentalApplications as applications, coApplicants, vehicles } from "../../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { notifyOwner } from "../../_core/notification";
-import { sendApplicationReceipt } from "../../emailService";
+import { sendApplicationReceipt, sendRentalApplicationPdfToStaff } from "../../emailService";
+import { generateRentalApplicationPDF, type RentalApplicationPDFData } from "../../rentalPdfGenerator";
 import bcrypt from "bcryptjs";
 
 async function hashPassword(password: string): Promise<string> {
@@ -218,6 +219,9 @@ export const applicationRouter = router({
       if (d.additionalIncome !== undefined) updateData.additionalIncome = s(d.additionalIncome);
       if (d.employmentFrom !== undefined) updateData.employmentFrom = s(d.employmentFrom);
       if (d.employmentTo !== undefined) updateData.employmentTo = s(d.employmentTo);
+      if (d.incomeProofUrls !== undefined && Array.isArray(d.incomeProofUrls)) {
+        updateData.incomeProofUrls = d.incomeProofUrls;
+      }
       if (d.emergencyName !== undefined) updateData.emergencyName = s(d.emergencyName);
       if (d.emergencyRelationship !== undefined) updateData.emergencyRelationship = s(d.emergencyRelationship);
       if (d.emergencyPhone !== undefined) updateData.emergencyPhone = s(d.emergencyPhone);
@@ -627,16 +631,19 @@ export const applicationRouter = router({
 
       if (apps.length > 0) {
         const app = apps[0];
+        const applicantName = `${app.firstName || ""} ${app.lastName || ""}`.trim() || app.email || "Applicant";
+
         // Notify owner (fire-and-forget)
         notifyOwner({
           title: "New Rental Application Submitted",
           content: `New application submitted.\n\nApplicant: ${app.firstName} ${app.lastName}\nEmail: ${app.email}\nProperty: ${app.propertyAddress || "Not specified"}\nApplication ID: ${input.applicationId}`,
         }).catch(() => {});
+
         // Send receipt email to applicant (fire-and-forget)
         if (app.email) {
           sendApplicationReceipt({
             applicationId: input.applicationId,
-            applicantName: `${app.firstName || ""} ${app.lastName || ""}`.trim() || app.email,
+            applicantName,
             applicantEmail: app.email,
             propertyAddress: app.propertyAddress,
             submittedAt: new Date(),
@@ -645,6 +652,114 @@ export const applicationRouter = router({
             stripePaymentIntentId: app.stripePaymentIntentId,
           }).catch(() => {});
         }
+
+        // Generate rental application PDF and email to staff (fire-and-forget)
+        (async () => {
+          try {
+            const [fullApp] = await db.select().from(applications).where(eq(applications.id, input.applicationId)).limit(1);
+            if (!fullApp) return;
+
+            const coApps = await db.select().from(coApplicants).where(eq(coApplicants.applicationId, input.applicationId));
+            const vehicleList = await db.select().from(vehicles).where(eq(vehicles.applicationId, input.applicationId));
+
+            const pdfData: RentalApplicationPDFData = {
+              applicationId: input.applicationId,
+              propertyAddress: fullApp.propertyAddress,
+              submittedAt: fullApp.submittedAt,
+              firstName: fullApp.firstName,
+              lastName: fullApp.lastName,
+              ssn: fullApp.ssn,
+              dateOfBirth: fullApp.dateOfBirth,
+              maritalStatus: fullApp.maritalStatus,
+              cellPhone: fullApp.cellPhone,
+              workPhone: fullApp.workPhone,
+              email: fullApp.email,
+              dlState: fullApp.dlState,
+              dlNumber: fullApp.dlNumber,
+              dlFrontUrl: fullApp.dlFrontUrl,
+              dlBackUrl: fullApp.dlBackUrl,
+              incomeProofUrls: fullApp.incomeProofUrls ?? undefined,
+              currentStreet: fullApp.currentStreet,
+              currentCity: fullApp.currentCity,
+              currentState: fullApp.currentState,
+              currentZip: fullApp.currentZip,
+              reasonForMoving: fullApp.reasonForMoving,
+              employerName: fullApp.employerName,
+              employerStreet: fullApp.employerStreet,
+              employerCity: fullApp.employerCity,
+              employerState: fullApp.employerState,
+              employerZip: fullApp.employerZip,
+              position: fullApp.position,
+              officePhone: fullApp.officePhone,
+              monthlyGrossPay: fullApp.monthlyGrossPay,
+              supervisorName: fullApp.supervisorName,
+              supervisorPhone: fullApp.supervisorPhone,
+              additionalIncome: fullApp.additionalIncome,
+              employmentFrom: fullApp.employmentFrom,
+              employmentTo: fullApp.employmentTo,
+              emergencyName: fullApp.emergencyName,
+              emergencyRelationship: fullApp.emergencyRelationship,
+              emergencyPhone: fullApp.emergencyPhone,
+              emergencyEmail: fullApp.emergencyEmail,
+              emergencyAddress: fullApp.emergencyAddress,
+              emergencyCity: fullApp.emergencyCity,
+              emergencyState: fullApp.emergencyState,
+              emergencyZip: fullApp.emergencyZip,
+              medicalName: fullApp.medicalName,
+              medicalPhone: fullApp.medicalPhone,
+              medicalEmail: fullApp.medicalEmail,
+              medicalAddress: fullApp.medicalAddress,
+              medicalCity: fullApp.medicalCity,
+              medicalZip: fullApp.medicalZip,
+              beenSued: fullApp.beenSued,
+              brokenLease: fullApp.brokenLease,
+              convictedFelony: fullApp.convictedFelony,
+              moveInAmountAvailable: fullApp.moveInAmountAvailable,
+              filedBankruptcy: fullApp.filedBankruptcy,
+              bankruptcyDischarged: fullApp.bankruptcyDischarged,
+              rentPlanDuration: fullApp.rentPlanDuration,
+              lockedOutBySheriff: fullApp.lockedOutBySheriff,
+              servedLateRentNote: fullApp.servedLateRentNote,
+              occupantsSmoke: fullApp.occupantsSmoke,
+              landlordProblems: fullApp.landlordProblems,
+              landlordProblemsExplanation: fullApp.landlordProblemsExplanation,
+              additionalIncomeSource: fullApp.additionalIncomeSource,
+              creditCheckComment: fullApp.creditCheckComment,
+              petsInfo: fullApp.petsInfo,
+              howHeardAboutHome: fullApp.howHeardAboutHome,
+              signatureName: fullApp.signatureName?.startsWith("__pwdhash__") ? null : fullApp.signatureName,
+              signatureDrawUrl: fullApp.signatureDrawUrl,
+              signatureDate: fullApp.signatureDate,
+              paymentStatus: fullApp.paymentStatus,
+              paymentAmount: fullApp.paymentAmount ?? null,
+              coApplicants: coApps.map((c) => ({
+                firstName: c.firstName,
+                lastName: c.lastName,
+                ssn: c.ssn,
+                dateOfBirth: c.dateOfBirth,
+                cellPhone: c.cellPhone,
+                email: c.email,
+              })),
+              vehicles: vehicleList.map((v) => ({
+                make: v.make,
+                model: v.model,
+                color: v.color,
+                year: v.year,
+                licensePlate: v.licensePlate,
+              })),
+            };
+
+            const pdfBuffer = await generateRentalApplicationPDF(pdfData);
+            await sendRentalApplicationPdfToStaff({
+              applicationId: input.applicationId,
+              applicantName,
+              applicantEmail: app.email,
+              pdfBuffer,
+            });
+          } catch (err) {
+            console.error("[Submit] Failed to generate/send rental application PDF for", input.applicationId, err);
+          }
+        })();
       }
       return { success: true };
     }),
